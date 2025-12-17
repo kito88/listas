@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas por Grupo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Minhas Tarefas por Grupo</h1>
+        
+        <div class="group-management">
+            <h2>Grupos</h2>
+            <select id="group-select">
+                </select>
+            <input type="text" id="new-group-input" placeholder="Novo nome de grupo">
+            <button id="add-group-button">Criar Grupo</button>
+            <button id="delete-group-button" style="background-color: #d9534f;">Excluir Grupo</button>
+        </div>
+
+        <hr>
+
+        <h2>Tarefas do Grupo Atual</h2>
+        
+        <div class="input-area">
+            <input type="text" id="task-input" placeholder="Nova tarefa...">
+            <button id="add-button">Adicionar Tarefa</button>
+        </div>
+
+        <ul id="task-list">
+            </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
