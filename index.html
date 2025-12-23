@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Tarefas por Grupo</title>
     <link rel="stylesheet" href="style.css">
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // 2. Sua configuração (MANTIDA conforme o seu projeto criado)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRqGj35z-PtjEGrgPtiRjRQd3VDdqUMFA",
+            authDomain: "lista-de-tarefas-ad9a2.firebaseapp.com",
+            projectId: "lista-de-tarefas-ad9a2",
+            storageBucket: "lista-de-tarefas-ad9a2.firebasestorage.app",
+            messagingSenderId: "13035819632",
+            appId: "1:13035819632:web:b07d72f81761ebae8a9ab5",
+            measurementId: "G-36DQD0ZEYW"
+        };
+
+        // 3. Inicializando o Firebase e tornando-o acessível ao script.js
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Exportamos para o objeto global 'window' para o script.js enxergar
+        window.db = db;
+        window.FirebaseFirestore = { doc, getDoc, setDoc, collection };
+    </script>
 </head>
 <body>
     <div class="container">
@@ -12,8 +36,7 @@
         
         <div class="group-management">
             <h2>Grupos</h2>
-            <select id="group-select">
-                </select>
+            <select id="group-select"></select>
             <input type="text" id="new-group-input" placeholder="Novo nome de grupo">
             <button id="add-group-button">Criar Grupo</button>
             <button id="delete-group-button" style="background-color: #d9534f;">Excluir Grupo</button>
@@ -28,8 +51,7 @@
             <button id="add-button">Adicionar Tarefa</button>
         </div>
 
-        <ul id="task-list">
-            </ul>
+        <ul id="task-list"></ul>
     </div>
 
     <script src="script.js"></script>
