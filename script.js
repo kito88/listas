@@ -1,4 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- Referências do Firebase (Exportadas no index.html) ---
+    const db = window.db;
+    const { doc, getDoc, setDoc } = window.FirebaseFirestore;
+
     // --- Referências dos Elementos DOM ---
     const taskInput = document.getElementById('task-input');
     const addButton = document.getElementById('add-button');
@@ -10,29 +14,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteGroupButton = document.getElementById('delete-group-button');
     
     // --- Variáveis de Estado ---
-    let tasksByGroup = {}; // Objeto central de dados: { 'Grupo': [tarefa1, tarefa2], ... }
+    let tasksByGroup = {}; 
     let currentGroup = '';
     
-    // ID fixo do documento no Firestore para armazenar todos os dados
-    // ESTE CÓDIGO DEPENDE QUE 'db' E 'listCollection' FORAM DEFINIDOS NO SEU index.html
-    const DOC_ID = 'masterList'; 
-    const listCollection = db.collection("todoAppList"); // Assuming 'db' is available from index.html
-
-    // Estrutura de uma Tarefa: { text: '...', completed: false }
+    // Referência única para o documento no Firestore (Sintaxe Modular v10)
+    const DOC_REF = doc(db, "todoAppList", "masterList");
 
     // --- FUNÇÕES DE PERSISTÊNCIA (FIRESTORE) ---
     
     /**
      * Salva o objeto 'tasksByGroup' completo no Firestore.
-     * Deve ser chamado sempre que os dados forem modificados.
      */
     async function saveTasks() {
         try {
-            await listCollection.doc(DOC_ID).set(tasksByGroup);
+            // No Firebase v10 usamos setDoc passando a referência e os dados
+            await setDoc(DOC_REF, tasksByGroup);
             console.log("Dados sincronizados com sucesso no Firestore.");
         } catch (error) {
             console.error("Erro ao escrever no Firestore: ", error);
-            // Poderia adicionar feedback visual ao usuário aqui
         }
     }
 
@@ -41,20 +40,20 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function loadTasks() {
         try {
-            const doc = await listCollection.doc(DOC_ID).get();
+            // No Firebase v10 usamos getDoc
+            const docSnap = await getDoc(DOC_REF);
 
-            if (doc.exists) {
-                tasksByGroup = doc.data(); 
+            if (docSnap.exists()) {
+                tasksByGroup = docSnap.data(); 
             } else {
-                // Se o documento não existe (primeira execução), inicializa
+                // Se o documento não existe, inicializa com o grupo Geral
                 tasksByGroup = { 'Geral': [] };
-                await saveTasks(); // Cria o documento inicial no Firestore
+                await saveTasks(); 
             }
             
-            // Configura o grupo inicial e popula o seletor
             populateGroupSelect();
             
-            // Seleciona o grupo inicial
+            // Define o grupo inicial
             const groupNames = Object.keys(tasksByGroup);
             currentGroup = groupSelect.options[0] ? groupSelect.options[0].value : 'Geral';
             groupSelect.value = currentGroup;
@@ -63,8 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             console.error("Erro ao carregar dados do Firestore: ", error);
-            alert("Erro ao conectar com o banco de dados. Verifique a configuração do Firebase.");
-            // Falha grave, inicializa a UI localmente, sem sincronização
             tasksByGroup = { 'Geral': [] }; 
             populateGroupSelect();
             renderTasks();
@@ -73,11 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNÇÕES DE GRUPO ---
     function populateGroupSelect() {
-        groupSelect.innerHTML = ''; // Limpa as opções existentes
+        groupSelect.innerHTML = ''; 
         
         const groupNames = Object.keys(tasksByGroup);
         if (groupNames.length === 0) {
-            tasksByGroup['Geral'] = []; // Garante que 'Geral' sempre exista
+            tasksByGroup['Geral'] = []; 
             groupNames.push('Geral');
         }
 
@@ -88,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
             groupSelect.appendChild(option);
         });
         
-        // Define o grupo atualmente selecionado
         if (currentGroup && tasksByGroup[currentGroup]) {
              groupSelect.value = currentGroup;
         } else {
@@ -110,14 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        tasksByGroup[groupName] = []; // Cria a nova lista vazia no objeto
+        tasksByGroup[groupName] = []; 
         newGroupInput.value = '';
         
         populateGroupSelect();
         currentGroup = groupName;
         groupSelect.value = currentGroup;
-        renderTasks(); // Renderiza a nova lista vazia
-        await saveTasks(); // Sincroniza com o Firebase
+        renderTasks(); 
+        await saveTasks(); 
     }
     
     async function deleteGroup() {
@@ -128,19 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (confirm(`Tem certeza que deseja excluir o grupo "${currentGroup}" e todas as suas tarefas?`)) {
             delete tasksByGroup[currentGroup];
-            
-            // Seleciona o primeiro grupo restante como o novo grupo ativo
             currentGroup = Object.keys(tasksByGroup)[0];
             
             populateGroupSelect();
             renderTasks();
-            await saveTasks(); // Sincroniza com o Firebase
+            await saveTasks(); 
         }
     }
 
     // --- FUNÇÕES DE RENDERIZAÇÃO E TAREFAS ---
 
-    // Função para criar o HTML de uma tarefa
     function createTaskElement(task, taskIndex) {
         const listItem = document.createElement('li');
         listItem.classList.toggle('completed', task.completed); 
@@ -152,42 +145,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const actionsDiv = document.createElement('div');
         actionsDiv.classList.add('actions');
 
-        // Botão de Conclusão
         const completeButton = document.createElement('button');
         completeButton.textContent = '✔️ Concluir';
         completeButton.classList.add('complete-btn');
-        completeButton.onclick = async () => { // Função agora é async
-            // Alterna o estado de 'completed' no objeto de dados
+        completeButton.onclick = async () => {
             tasksByGroup[currentGroup][taskIndex].completed = !tasksByGroup[currentGroup][taskIndex].completed;
-            renderTasks(); // Renderiza novamente para atualizar a classe
-            await saveTasks(); // Sincroniza
+            renderTasks();
+            await saveTasks();
         };
 
-        // Botão de Edição
         const editButton = document.createElement('button');
         editButton.textContent = '✏️ Editar';
         editButton.classList.add('edit-btn');
-        editButton.onclick = async () => { // Função agora é async
+        editButton.onclick = async () => {
             const newText = prompt("Edite sua tarefa:", task.text);
             if (newText !== null && newText.trim() !== "") {
                 tasksByGroup[currentGroup][taskIndex].text = newText.trim();
-                renderTasks(); // Renderiza novamente para atualizar o texto
-                await saveTasks(); // Sincroniza
+                renderTasks();
+                await saveTasks();
             }
         };
 
-        // Botão de Exclusão
         const deleteButton = document.createElement('button');
         deleteButton.textContent = '🗑️ Excluir';
         deleteButton.classList.add('delete-btn');
-        deleteButton.onclick = async () => { // Função agora é async
-            // Remove a tarefa do array do grupo atual
+        deleteButton.onclick = async () => {
             tasksByGroup[currentGroup].splice(taskIndex, 1);
-            renderTasks(); // Renderiza novamente
-            await saveTasks(); // Sincroniza
+            renderTasks();
+            await saveTasks();
         };
 
-        // Montagem
         listItem.appendChild(taskSpan);
         actionsDiv.appendChild(completeButton);
         actionsDiv.appendChild(editButton);
@@ -197,37 +184,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return listItem;
     }
 
-    // Função principal para adicionar nova tarefa
-    async function addTask() { // Função agora é async
+    async function addTask() {
         if (!currentGroup) {
             alert("Por favor, selecione ou crie um grupo primeiro.");
             return;
         }
         
         const taskText = taskInput.value.trim();
-
         if (taskText === "") {
             alert("Por favor, insira uma tarefa.");
             return;
         }
         
-        // Adiciona a nova tarefa ao array do grupo ativo
         tasksByGroup[currentGroup].push({
             text: taskText,
             completed: false
         });
 
         taskInput.value = ''; 
-        renderTasks(); // Renderiza a lista atualizada
-        await saveTasks(); // Sincroniza
+        renderTasks(); 
+        await saveTasks(); 
     }
     
-    // Função para atualizar a lista de tarefas visível (Não precisa ser async)
     function renderTasks() {
-        taskList.innerHTML = ''; // Limpa a lista
-        
+        taskList.innerHTML = ''; 
         const currentTasks = tasksByGroup[currentGroup] || [];
-        
         currentTasks.forEach((task, index) => {
             const listItem = createTaskElement(task, index);
             taskList.appendChild(listItem);
@@ -235,8 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- EVENT LISTENERS ---
-    
-    // Evento de Adicionar Tarefa
     addButton.addEventListener('click', addTask);
     taskInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
@@ -244,18 +223,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Evento de Criação de Grupo
     addGroupButton.addEventListener('click', addGroup);
-    
-    // Evento de Exclusão de Grupo
     deleteGroupButton.addEventListener('click', deleteGroup);
 
-    // Evento de Mudança de Grupo Selecionado
     groupSelect.addEventListener('change', (event) => {
         currentGroup = event.target.value;
-        renderTasks(); // Recarrega a lista de tarefas para o novo grupo
+        renderTasks();
     });
 
-    // Inicia o aplicativo
-    loadTasks();
+    // Inicia o carregamento dos dados do Firestore
+    await loadTasks();
 });
