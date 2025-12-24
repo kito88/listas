@@ -1,142 +1,177 @@
+/* --- CONFIGURAÇÕES GERAIS --- */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f0f2f5;
     display: flex;
     justify-content: center;
-    padding: 20px;
+    padding: 10px;
+    margin: 0;
 }
 
 .container {
     background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    box-sizing: border-box; /* Garante que o padding não aumente a largura total */
 }
 
 h1 {
     text-align: center;
-    color: #333;
-}
-
-.input-area {
-    display: flex;
+    color: #1a1a1a;
+    font-size: 1.5rem;
     margin-bottom: 20px;
 }
 
-#task-input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px 0 0 4px; /* Canto arredondado apenas à esquerda */
+h2 {
+    font-size: 1.1rem;
+    color: #555;
+    margin-top: 0;
 }
 
-#add-button {
-    padding: 10px 15px;
-    background-color: #5cb85c;
-    color: white;
+/* --- GERENCIAMENTO DE GRUPOS E ENTRADA --- */
+.group-management, .input-area {
+    display: flex;
+    flex-direction: column; /* Empilha no celular */
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.input-area {
+    background-color: transparent;
+    padding: 0;
     border: none;
+}
+
+/* Ajuste de largura total para inputs no celular */
+#group-select, #new-group-input, #task-input {
+    width: 100%; 
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px; /* Evita zoom automático no iPhone ao clicar */
+    box-sizing: border-box;
+}
+
+#add-button, #add-group-button, #delete-group-button {
+    width: 100%;
+    padding: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    border-radius: 0 4px 4px 0; /* Canto arredondado apenas à direita */
+    transition: background 0.3s;
+    color: white;
 }
 
-#add-button:hover {
-    background-color: #4cae4c;
-}
+#add-button { background-color: #28a745; }
+#add-group-button { background-color: #007bff; }
+#delete-group-button { background-color: #d9534f; }
 
+/* --- LISTA DE TAREFAS --- */
 #task-list {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 #task-list li {
     background: #fff;
-    padding: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     border: 1px solid #eee;
-    border-radius: 4px;
+    border-radius: 8px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* Texto em cima, botões embaixo no celular */
+    padding: 15px;
+    gap: 12px;
+    transition: transform 0.2s;
+}
+
+.task-text {
+    font-size: 16px;
+    color: #333;
+    word-break: break-word; /* Evita que palavras longas quebrem o layout */
+}
+
+.completed .task-text {
+    text-decoration: line-through;
+    color: #888;
 }
 
 .completed {
-    text-decoration: line-through;
-    color: #888;
-    background-color: #e0e0e0;
+    background-color: #f8f9fa !important;
+}
+
+/* --- BOTÕES DE AÇÃO --- */
+.actions {
+    display: flex;
+    gap: 8px;
+    width: 100%;
 }
 
 .actions button {
-    margin-left: 8px;
-    padding: 5px 10px;
+    flex: 1; /* Botões dividem o espaço por igual no celular */
+    padding: 10px 5px;
     border: none;
-    border-radius: 3px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.edit-btn {
-    background-color: #f0ad4e;
-    color: white;
-}
+.complete-btn { background-color: #e7f4e8; color: #28a745; border: 1px solid #28a745 !important; }
+.edit-btn { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba !important; }
+.delete-btn { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb !important; }
 
-.delete-btn {
-    background-color: #d9534f;
-    color: white;
-}
-
-/* ... (Mantenha o CSS anterior) ... */
-
-.group-management {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #f9f9f9;
-}
-
-.group-management h2 {
-    margin-top: 0;
-    color: #555;
-}
-
-#group-select, #new-group-input {
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    width: 150px;
-}
-
-#add-group-button, #delete-group-button {
-    padding: 8px 12px;
-    margin-top: 5px; /* Para melhor alinhamento */
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    color: white;
-}
-
-#add-group-button {
-    background-color: #007bff; /* Azul para adicionar grupo */
-}
-
-#add-group-button:hover {
-    background-color: #0056b3;
-}
-
-/* O estilo do botão de exclusão de grupo já está no HTML, mas podemos refinar aqui */
-#delete-group-button {
-    background-color: #d9534f; /* Vermelho para excluir */
-}
-
-#delete-group-button:hover {
-    background-color: #c9302c;
-}
-
+/* --- DIVISOR --- */
 hr {
     border: 0;
     height: 1px;
-    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0));
+    background-color: #eee;
     margin: 20px 0;
+}
+
+/* --- MEDIA QUERIES (AJUSTES PARA TELAS MAIORES) --- */
+@media (min-width: 480px) {
+    .group-management, .input-area {
+        flex-direction: row; /* Volta a ficar lado a lado no PC */
+        flex-wrap: wrap;
+    }
+
+    #group-select, #new-group-input {
+        width: calc(50% - 5px); /* Dois por linha no gerenciamento de grupo */
+    }
+
+    #task-input {
+        flex: 1;
+    }
+
+    #add-button, #add-group-button, #delete-group-button {
+        width: auto;
+        padding: 10px 20px;
+    }
+
+    #task-list li {
+        flex-direction: row; /* Texto e botões na mesma linha no PC */
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .actions {
+        width: auto; /* No PC, os botões não ocupam a largura toda */
+    }
+    
+    .actions button {
+        flex: none;
+        padding: 8px 12px;
+    }
 }
