@@ -1,0 +1,23 @@
+name: Deploy to Firebase Hosting on push
+
+on:
+  push:
+    branches:
+      - main # ou master, dependendo do seu branch principal
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Se você não tem um build script (como no nosso caso)
+      # Apenas deploy direto:
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_LISTA_DE_TAREFAS_AD9A2 }}'
+          projectId: lista-de-tarefas-ad9a2
+          channelId: live # ou outro nome de canal
+          # A pasta 'public' deve coincidir com a que você configurou no firebase.json
+          target: appWeb # Se o seu firebase.json definir um target de hosting
