@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tarefas por Grupo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <script type="module">
+        // Importar as funções necessárias do SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
+        // Suas configurações do aplicativo Firebase (MANTIDAS)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRqGj35z-PtjEGrgPtiRjRQd3VDdqUMFA",
+            authDomain: "lista-de-tarefas-ad9a2.firebaseapp.com",
+            projectId: "lista-de-tarefas-ad9a2",
+            storageBucket: "lista-de-tarefas-ad9a2.firebasestorage.app",
+            messagingSenderId: "13035819632",
+            appId: "1:13035819632:web:b07d72f81761ebae8a9ab5",
+            measurementId: "G-36DQD0ZEYW"
+        };
+
+        // 1. Inicializar o Firebase App
+        const app = initializeApp(firebaseConfig);
+        
+        // 2. Obter a referência do Firestore
+        const firestoreDB = getFirestore(app);
+        
+        // 3. Obter a referência da Coleção
+        const firestoreCollection = collection(firestoreDB, "todoAppList");
+
+        // 4. EXPOR AS VARIÁVEIS GLOBALMENTE para o script.js
+        window.db = firestoreDB;
+        window.listCollection = firestoreCollection;
+    </script>
+    
+    <div class="container">
+        <h1>Minhas Tarefas por Grupo</h1>
+        
+        <div class="group-management">
+            <h2>Grupos</h2>
+            <select id="group-select">
+            </select>
+            <input type="text" id="new-group-input" placeholder="Novo nome de grupo">
+            <button id="add-group-button">Criar Grupo</button>
+            <button id="delete-group-button" style="background-color: #d9534f;">Excluir Grupo</button>
+        </div>
+        
+        <hr>
+
+        <h2>Tarefas do Grupo Atual</h2>
+        
+        <div class="input-area">
+            <input type="text" id="task-input" placeholder="Nova tarefa...">
+            <button id="add-button">Adicionar Tarefa</button>
+        </div>
+
+        <ul id="task-list">
+        </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
